@@ -3,6 +3,7 @@ import { Box, Text, useInput, useApp } from 'ink';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import { Header } from './Header.js';
+import LoadingSpinner from './LoadingSpinner.js';
 import { colors, energyColors, priorityColors } from '../utils/theme.js';
 import { EnergyLevel, TimeNeeded, Priority, Task } from '../types/index.js';
 import { createTask } from '../services/tasks.js';
@@ -84,7 +85,7 @@ export const AddTask: React.FC<AddTaskProps> = ({ onBack, onTaskAdded }) => {
       
       if (err instanceof Error) {
         errorMessage = err.message;
-        console.error('📋 Szczegóły błędu:', {
+        console.error('[INFO] Szczegóły błędu:', {
           name: err.name,
           message: err.message,
           stack: err.stack
@@ -95,7 +96,7 @@ export const AddTask: React.FC<AddTaskProps> = ({ onBack, onTaskAdded }) => {
       if (typeof err === 'object' && err !== null) {
         const supabaseError = err as any;
         if (supabaseError.code || supabaseError.details) {
-          console.error('🔴 Błąd Supabase:', {
+          console.error('[ERROR] Błąd Supabase:', {
             code: supabaseError.code,
             message: supabaseError.message,
             details: supabaseError.details,
@@ -272,7 +273,7 @@ export const AddTask: React.FC<AddTaskProps> = ({ onBack, onTaskAdded }) => {
           minWidth={45}
           justifyContent="center"
         >
-          <Text color="yellow">💾 Zapisywanie zadania...</Text>
+          <LoadingSpinner message="Zapisywanie zadania..." type="dots" color="yellow" />
         </Box>
       </Box>
     );
@@ -298,7 +299,7 @@ export const AddTask: React.FC<AddTaskProps> = ({ onBack, onTaskAdded }) => {
             <Box marginTop={1}>
               {error && (
                 <Box marginBottom={1}>
-                  <Text color="red">❌ {error}</Text>
+                  <Text color="red">[ERROR] {error}</Text>
                 </Box>
               )}
               

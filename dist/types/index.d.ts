@@ -1,7 +1,7 @@
 export type EnergyLevel = 'XS' | 'S' | 'M' | 'L' | 'XL';
 export type TimeNeeded = '1min' | '15min' | '25min' | 'more';
 export type Priority = 'A' | 'B' | 'C' | 'D';
-export type TaskStatus = 'todo' | 'done';
+export type TaskStatus = 'todo' | 'done' | 'completed';
 export type GoalType = 'long_term' | 'short_term';
 export type GoalTimeframe = 'quarter' | 'half_year' | 'year' | 'month' | 'week';
 export interface Task {

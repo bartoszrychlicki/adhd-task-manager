@@ -47,13 +47,13 @@ export const saveConfig = async (config: UserConfig): Promise<void> => {
 };
 
 export const getUserId = async (): Promise<string> => {
-  console.log('🔑 Pobieranie User ID...');
+  console.log('[CONFIG] Pobieranie User ID...');
   try {
     const config = await loadConfig();
-    console.log('✅ User ID pobrane:', config.userId);
+    console.log('[OK] User ID pobrane:', config.userId);
     return config.userId;
   } catch (err) {
-    console.error('❌ Błąd podczas pobierania User ID:', err);
+    console.error('[ERROR] Błąd podczas pobierania User ID:', err);
     throw err;
   }
 };

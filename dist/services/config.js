@@ -37,14 +37,14 @@ export const saveConfig = async (config) => {
     await fs.writeFile(CONFIG_FILE, JSON.stringify(updatedConfig, null, 2), 'utf-8');
 };
 export const getUserId = async () => {
-    console.log('🔑 Pobieranie User ID...');
+    console.log('[CONFIG] Pobieranie User ID...');
     try {
         const config = await loadConfig();
-        console.log('✅ User ID pobrane:', config.userId);
+        console.log('[OK] User ID pobrane:', config.userId);
         return config.userId;
     }
     catch (err) {
-        console.error('❌ Błąd podczas pobierania User ID:', err);
+        console.error('[ERROR] Błąd podczas pobierania User ID:', err);
         throw err;
     }
 };

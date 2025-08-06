@@ -1,21 +1,68 @@
 import { supabase } from './supabase.js';
 import { getUserId } from './config.js';
 import { Task } from '../types/index.js';
+import { enhanceTask } from './ai.js';
 
 export const createTask = async (task: Omit<Task, 'id' | 'user_id' | 'created_at' | 'status'>) => {
-  console.log('🔧 createTask - rozpoczęcie');
+  console.log('[TOOL] createTask - rozpoczęcie');
   
   try {
     const userId = await getUserId();
-    console.log('👤 Pobrano User ID:', userId);
+    console.log('[USER] Pobrano User ID:', userId);
+
+    // Determine which fields are empty and need AI enhancement
+    const needsEnhancement = 
+      !task.priority || 
+      !task.energy_level || 
+      !task.time_needed || 
+      !task.execution_time;
+
+    let enhancedTask = { ...task };
+
+    if (needsEnhancement) {
+      console.log('[AI] Wysyłanie do AI w celu uzupełnienia...');
+      
+      try {
+        const aiEnhancement = await enhanceTask({
+          title: task.title,
+          priority: task.priority,
+          energy_level: task.energy_level,
+          time_needed: task.time_needed,
+          execution_time: task.execution_time
+        });
+
+        // Merge AI suggestions only for empty fields
+        if (!task.priority && aiEnhancement.priority) {
+          enhancedTask.priority = aiEnhancement.priority;
+        }
+        if (!task.energy_level && aiEnhancement.energy_level) {
+          enhancedTask.energy_level = aiEnhancement.energy_level;
+        }
+        if (!task.time_needed && aiEnhancement.time_needed) {
+          enhancedTask.time_needed = aiEnhancement.time_needed;
+        }
+        if (!task.execution_time && aiEnhancement.execution_time) {
+          enhancedTask.execution_time = aiEnhancement.execution_time;
+        }
+
+        console.log('[AI] AI uzupełniło zadanie:', {
+          original: task,
+          enhanced: enhancedTask,
+          reasoning: aiEnhancement.reasoning
+        });
+      } catch (aiError) {
+        console.warn('[WARN] Błąd AI, kontynuuję bez uzupełnienia:', aiError);
+        // Continue with original task if AI fails
+      }
+    }
 
     const taskData = {
-      ...task,
+      ...enhancedTask,
       user_id: userId,
       status: 'todo' as const
     };
     
-    console.log('📝 Dane do zapisania:', taskData);
+    console.log('[DATA] Dane do zapisania:', taskData);
 
     const { data, error } = await supabase
       .from('tasks')
@@ -23,27 +70,27 @@ export const createTask = async (task: Omit<Task, 'id' | 'user_id' | 'created_at
       .select()
       .single();
 
-    console.log('📊 Odpowiedź Supabase:', { data, error });
+    console.log('[DB] Odpowiedź Supabase:', { data, error });
 
     if (error) {
-      console.error('🚨 Błąd Supabase w createTask:', error);
+      console.error('[ERROR] Błąd Supabase w createTask:', error);
       throw error;
     }
     
-    console.log('✅ Zadanie zapisane pomyślnie:', data);
+    console.log('[OK] Zadanie zapisane pomyślnie:', data);
     return data;
   } catch (err) {
-    console.error('💥 Nieoczekiwany błąd w createTask:', err);
+    console.error('[ERROR] Nieoczekiwany błąd w createTask:', err);
     throw err;
   }
 };
 
 export const getTasks = async () => {
-  console.log('🔧 getTasks - rozpoczęcie');
+  console.log('[TOOL] getTasks - rozpoczęcie');
   
   try {
     const userId = await getUserId();
-    console.log('👤 Pobrano User ID:', userId);
+    console.log('[USER] Pobrano User ID:', userId);
 
     const { data, error } = await supabase
       .from('tasks')
@@ -51,27 +98,34 @@ export const getTasks = async () => {
       .eq('user_id', userId)
       .order('created_at', { ascending: false });
 
-    console.log('📊 Odpowiedź Supabase (getTasks):', { 
+    console.log('[DB] Odpowiedź Supabase (getTasks):', { 
       dataCount: data?.length || 0, 
       error 
     });
 
     if (error) {
-      console.error('🚨 Błąd Supabase w getTasks:', error);
+      console.error('[ERROR] Błąd Supabase w getTasks:', error);
       throw error;
     }
     
-    console.log('✅ Zadania pobrane, ilość:', data?.length || 0);
+    console.log('[OK] Zadania pobrane, ilość:', data?.length || 0);
+    if (data && data.length > 0) {
+      console.log('[TASKS] Lista zadań z statusami:', data.map(t => ({ 
+        id: t.id, 
+        title: t.title, 
+        status: t.status 
+      })));
+    }
     return data || [];
   } catch (err) {
-    console.error('💥 Nieoczekiwany błąd w getTasks:', err);
+    console.error('[ERROR] Nieoczekiwany błąd w getTasks:', err);
     throw err;
   }
 };
 
 export const updateTask = async (id: string, updates: Partial<Task>) => {
-  console.log('🔧 updateTask - rozpoczęcie, ID:', id);
-  console.log('📝 Aktualizacje:', updates);
+  console.log('[TOOL] updateTask - rozpoczęcie, ID:', id);
+  console.log('[DATA] Aktualizacje:', updates);
   
   try {
     const { data, error } = await supabase
@@ -81,23 +135,23 @@ export const updateTask = async (id: string, updates: Partial<Task>) => {
       .select()
       .single();
 
-    console.log('📊 Odpowiedź Supabase (update):', { data, error });
+    console.log('[DB] Odpowiedź Supabase (update):', { data, error });
 
     if (error) {
-      console.error('🚨 Błąd Supabase w updateTask:', error);
+      console.error('[ERROR] Błąd Supabase w updateTask:', error);
       throw error;
     }
     
-    console.log('✅ Zadanie zaktualizowane:', data);
+    console.log('[OK] Zadanie zaktualizowane:', data);
     return data;
   } catch (err) {
-    console.error('💥 Nieoczekiwany błąd w updateTask:', err);
+    console.error('[ERROR] Nieoczekiwany błąd w updateTask:', err);
     throw err;
   }
 };
 
 export const deleteTask = async (id: string) => {
-  console.log('🔧 deleteTask - rozpoczęcie, ID:', id);
+  console.log('[TOOL] deleteTask - rozpoczęcie, ID:', id);
   
   try {
     const { error } = await supabase
@@ -105,16 +159,16 @@ export const deleteTask = async (id: string) => {
       .delete()
       .eq('id', id);
 
-    console.log('📊 Odpowiedź Supabase (delete):', { error });
+    console.log('[DB] Odpowiedź Supabase (delete):', { error });
 
     if (error) {
-      console.error('🚨 Błąd Supabase w deleteTask:', error);
+      console.error('[ERROR] Błąd Supabase w deleteTask:', error);
       throw error;
     }
     
-    console.log('✅ Zadanie usunięte');
+    console.log('[OK] Zadanie usunięte');
   } catch (err) {
-    console.error('💥 Nieoczekiwany błąd w deleteTask:', err);
+    console.error('[ERROR] Nieoczekiwany błąd w deleteTask:', err);
     throw err;
   }
 };

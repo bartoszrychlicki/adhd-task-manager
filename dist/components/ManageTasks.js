@@ -4,6 +4,7 @@ import { Box, Text, useInput } from 'ink';
 import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
 import { Header } from './Header.js';
+import LoadingSpinner from './LoadingSpinner.js';
 import { priorityIcons } from '../utils/theme.js';
 import { getTasks, updateTask, deleteTask } from '../services/tasks.js';
 const energyOptions = [
@@ -66,7 +67,7 @@ export const ManageTasks = ({ onBack }) => {
             const currentTask = tasks[currentTaskIndex];
             if (input.toLowerCase() === 'e' && currentTask) {
                 // Edit currently highlighted task
-                console.log('🔧 Edytowanie zadania:', currentTask.title);
+                console.log('[TOOL] Edytowanie zadania:', currentTask.title);
                 setSelectedTask(currentTask);
                 startEditing(currentTask);
             }
@@ -87,15 +88,15 @@ export const ManageTasks = ({ onBack }) => {
         setIsLoading(true);
         setError(null);
         try {
-            console.log('📋 Ładowanie zadań...');
+            console.log('[INFO] Ładowanie zadań...');
             const taskList = await getTasks();
-            console.log('✅ Zadania załadowane:', taskList.length);
+            console.log('[OK] Zadania załadowane:', taskList.length);
             setTasks(taskList);
             setCurrentTaskIndex(0); // Reset to first task
             setViewState('list');
         }
         catch (err) {
-            console.error('❌ Błąd podczas ładowania zadań:', err);
+            console.error('[ERROR] Błąd podczas ładowania zadań:', err);
             setError(err instanceof Error ? err.message : 'Błąd podczas ładowania zadań');
             setViewState('list');
         }
@@ -115,10 +116,10 @@ export const ManageTasks = ({ onBack }) => {
             console.log('🔄 Zmiana statusu zadania:', task.id, 'na', newStatus);
             await updateTask(task.id, updates);
             await loadTasks();
-            console.log('✅ Status zadania zmieniony');
+            console.log('[OK] Status zadania zmieniony');
         }
         catch (err) {
-            console.error('❌ Błąd podczas zmiany statusu:', err);
+            console.error('[ERROR] Błąd podczas zmiany statusu:', err);
             setError(err instanceof Error ? err.message : 'Błąd podczas zmiany statusu');
         }
         finally {
@@ -147,15 +148,15 @@ export const ManageTasks = ({ onBack }) => {
                 time_needed: editTimeNeeded,
                 priority: editPriority
             };
-            console.log('💾 Zapisywanie zmian zadania:', selectedTask.id, updates);
+            console.log('[SAVE] Zapisywanie zmian zadania:', selectedTask.id, updates);
             await updateTask(selectedTask.id, updates);
             await loadTasks();
             setViewState('list');
             setSelectedTask(null);
-            console.log('✅ Zadanie zaktualizowane');
+            console.log('[OK] Zadanie zaktualizowane');
         }
         catch (err) {
-            console.error('❌ Błąd podczas zapisywania:', err);
+            console.error('[ERROR] Błąd podczas zapisywania:', err);
             setError(err instanceof Error ? err.message : 'Błąd podczas zapisywania');
         }
         finally {
@@ -173,10 +174,10 @@ export const ManageTasks = ({ onBack }) => {
             await loadTasks();
             setViewState('list');
             setSelectedTask(null);
-            console.log('✅ Zadanie usunięte');
+            console.log('[OK] Zadanie usunięte');
         }
         catch (err) {
-            console.error('❌ Błąd podczas usuwania:', err);
+            console.error('[ERROR] Błąd podczas usuwania:', err);
             setError(err instanceof Error ? err.message : 'Błąd podczas usuwania');
         }
         finally {
@@ -184,20 +185,20 @@ export const ManageTasks = ({ onBack }) => {
         }
     };
     const formatTaskDisplay = (task) => {
-        const status = task.status === 'done' ? '✅' : '⭕';
-        const priority = task.priority ? priorityIcons[task.priority] : '⚪';
+        const status = task.status === 'done' ? '[OK]' : '[O]';
+        const priority = task.priority ? priorityIcons[task.priority] : '[O]';
         const energy = task.energy_level || '?';
         const time = task.time_needed || '?';
         return `${status} ${priority} ${energy} ${time} │ ${task.title}`;
     };
     const renderTaskList = () => {
         if (isLoading && tasks.length === 0) {
-            return (_jsx(Box, { children: _jsx(Text, { color: "yellow", children: "\u23F3 \u0141adowanie zada\u0144..." }) }));
+            return (_jsx(Box, { children: _jsx(LoadingSpinner, { message: "\u0141adowanie zada\u0144...", type: "dots", color: "yellow" }) }));
         }
         if (tasks.length === 0) {
-            return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "gray", children: "\uD83D\uDCDD Nie masz jeszcze \u017Cadnych zada\u0144." }), _jsx(Text, { color: "gray", children: "Dodaj pierwsze zadanie z menu g\u0142\u00F3wnego!" }), _jsx(Box, { marginTop: 2, children: _jsx(Text, { color: "gray", children: "Esc - powr\u00F3t do menu" }) })] }));
+            return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "gray", children: "[TASK] Nie masz jeszcze \u017Cadnych zada\u0144." }), _jsx(Text, { color: "gray", children: "Dodaj pierwsze zadanie z menu g\u0142\u00F3wnego!" }), _jsx(Box, { marginTop: 2, children: _jsx(Text, { color: "gray", children: "Esc - powr\u00F3t do menu" }) })] }));
         }
-        return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "yellow", children: "Lista zada\u0144:" }), _jsx(Box, { marginTop: 1, flexDirection: "column", children: tasks.map((task, index) => (_jsx(Box, { marginY: 0, children: _jsxs(Text, { color: index === currentTaskIndex ? 'cyan' : 'white', bold: index === currentTaskIndex, children: [index === currentTaskIndex ? '❯ ' : '  ', formatTaskDisplay(task)] }) }, task.id))) }), tasks[currentTaskIndex] && (_jsx(Box, { marginTop: 1, paddingY: 1, borderTop: true, borderStyle: "single", borderColor: "cyan", children: _jsxs(Text, { color: "cyan", children: ["Wybrane: ", tasks[currentTaskIndex].title] }) })), _jsxs(Box, { marginTop: 1, flexDirection: "column", children: [_jsx(Text, { color: "gray", children: "\u2191\u2193 nawiguj po li\u015Bcie \u2502 Enter = zmie\u0144 status wybranego \u2502 E = edytuj \u2502 D = usu\u0144 \u2502 Esc = menu" }), _jsx(Text, { color: "yellow", dimColor: true, children: "\uD83D\uDCA1 Operacje dzia\u0142aj\u0105 na aktualnie pod\u015Bwietlonym zadaniu" })] })] }));
+        return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "yellow", children: "Lista zada\u0144:" }), _jsx(Box, { marginTop: 1, flexDirection: "column", children: tasks.map((task, index) => (_jsx(Box, { marginY: 0, children: _jsxs(Text, { color: index === currentTaskIndex ? 'cyan' : 'white', bold: index === currentTaskIndex, children: [index === currentTaskIndex ? '❯ ' : '  ', formatTaskDisplay(task)] }) }, task.id))) }), _jsx(Box, { marginTop: 1, flexDirection: "column", children: _jsx(Text, { color: "gray", children: "\u2191\u2193 nawiguj po li\u015Bcie \u2502 Enter = done/todo \u2502 E = edytuj \u2502 D = usu\u0144 \u2502 Esc = menu" }) })] }));
     };
     const renderEditForm = () => {
         if (!selectedTask)
@@ -259,8 +260,8 @@ export const ManageTasks = ({ onBack }) => {
                                     } }) })] }));
                 case 'confirm':
                     return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "yellow", children: "Podsumowanie zmian:" }), _jsxs(Box, { marginTop: 1, flexDirection: "column", children: [_jsxs(Text, { children: [_jsx(Text, { color: "white", children: "Nazwa: " }), _jsx(Text, { color: "cyan", children: editTitle })] }), _jsxs(Text, { children: [_jsx(Text, { color: "white", children: "Energia: " }), _jsx(Text, { color: "cyan", children: editEnergyLevel || 'brak' })] }), _jsxs(Text, { children: [_jsx(Text, { color: "white", children: "Czas: " }), _jsx(Text, { color: "cyan", children: editTimeNeeded || 'brak' })] }), _jsxs(Text, { children: [_jsx(Text, { color: "white", children: "Priorytet: " }), _jsx(Text, { color: "cyan", children: editPriority || 'brak' })] })] }), _jsx(Box, { marginTop: 2, children: _jsx(SelectInput, { items: [
-                                        { label: '✅ Zapisz zmiany', value: 'save' },
-                                        { label: '↩️ Powrót do edycji', value: 'back' }
+                                        { label: 'Zapisz zmiany', value: 'save' },
+                                        { label: '↩ Powrót do edycji', value: 'back' }
                                     ], onSelect: (item) => {
                                         if (item.value === 'save') {
                                             handleSaveEdit();
@@ -279,7 +280,7 @@ export const ManageTasks = ({ onBack }) => {
         if (!selectedTask)
             return null;
         return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Text, { color: "red", bold: true, children: "\uD83D\uDDD1\uFE0F USU\u0143 ZADANIE" }), _jsx(Box, { marginTop: 1, children: _jsx(Text, { color: "white", children: "Czy na pewno chcesz usun\u0105\u0107 zadanie:" }) }), _jsx(Box, { marginTop: 1, paddingX: 2, borderLeft: true, borderStyle: "single", borderColor: "yellow", children: _jsx(Text, { color: "yellow", children: selectedTask.title }) }), _jsx(Box, { marginTop: 2, children: _jsx(SelectInput, { items: [
-                            { label: '❌ Tak, usuń to zadanie', value: 'confirm' },
+                            { label: '[ERROR] Tak, usuń to zadanie', value: 'confirm' },
                             { label: '↩️ Nie, powrót do listy', value: 'cancel' }
                         ], onSelect: (item) => {
                             if (item.value === 'confirm') {
@@ -308,6 +309,6 @@ export const ManageTasks = ({ onBack }) => {
     if (isLoading && viewState !== 'list') {
         return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { borderStyle: "round", borderColor: "blue", paddingX: 1, paddingY: 1, minWidth: 55, justifyContent: "center", children: _jsx(Text, { color: "yellow", children: "\u23F3 Przetwarzanie..." }) })] }));
     }
-    return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { flexDirection: "column", alignItems: "center", children: _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 70, children: _jsxs(Box, { flexDirection: "column", width: "100%", children: [_jsx(Text, { color: "cyan", bold: true, children: "\uD83D\uDCCB ZARZ\u0104DZAJ ZADANIAMI" }), error && (_jsx(Box, { marginTop: 1, marginBottom: 1, children: _jsxs(Text, { color: "red", children: ["\u274C ", error] }) })), _jsx(Box, { marginTop: 1, children: renderCurrentView() })] }) }) })] }));
+    return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { flexDirection: "column", alignItems: "center", children: _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 70, children: _jsxs(Box, { flexDirection: "column", width: "100%", children: [_jsx(Text, { color: "cyan", bold: true, children: "[INFO] ZARZ\u0104DZAJ ZADANIAMI" }), error && (_jsx(Box, { marginTop: 1, marginBottom: 1, children: _jsxs(Text, { color: "red", children: ["[ERROR] ", error] }) })), _jsx(Box, { marginTop: 1, children: renderCurrentView() })] }) }) })] }));
 };
 //# sourceMappingURL=ManageTasks.js.map

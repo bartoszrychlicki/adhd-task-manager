@@ -6,13 +6,13 @@ import { colors } from '../utils/theme.js';
 export const Header: React.FC = () => {
   // Generate ASCII art with figlet - using retro fonts
   const adhdText = figlet.textSync('ADHD', {
-    font: 'isometric1',
+    font: 'Block' as figlet.Fonts,
     horizontalLayout: 'fitted',
     verticalLayout: 'default'
   });
 
   const taskManagerText = figlet.textSync('TASK MANAGER', {
-    font: 'Small',
+    font: 'Small' as figlet.Fonts,
     horizontalLayout: 'fitted', 
     verticalLayout: 'default'
   });
@@ -38,19 +38,6 @@ export const Header: React.FC = () => {
         </Text>
       </Box>
       
-      {/* C64-style subtitle */}
-      <Box marginY={1}>
-        <Text color="green">
-          ★ PRODUCTIVITY SYSTEM v1.0 ★ © 2024 ADHD LABS ★ ALL RIGHTS RESERVED ★
-        </Text>
-      </Box>
-      
-      {/* C64-style bottom border */}
-      <Box>
-        <Text color="magenta" bold>
-          ═══════════════════════════════════════════════════════════════════
-        </Text>
-      </Box>
       
       {/* Status line */}
       <Box marginTop={1}>

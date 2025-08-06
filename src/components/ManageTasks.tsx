@@ -3,6 +3,7 @@ import { Box, Text, useInput } from 'ink';
 import SelectInput from 'ink-select-input';
 import TextInput from 'ink-text-input';
 import { Header } from './Header.js';
+import LoadingSpinner from './LoadingSpinner.js';
 import { colors, energyColors, priorityColors, priorityIcons } from '../utils/theme.js';
 import { Task, EnergyLevel, TimeNeeded, Priority } from '../types/index.js';
 import { getTasks, updateTask, deleteTask } from '../services/tasks.js';
@@ -80,7 +81,7 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
       
       if (input.toLowerCase() === 'e' && currentTask) {
         // Edit currently highlighted task
-        console.log('🔧 Edytowanie zadania:', currentTask.title);
+        console.log('[TOOL] Edytowanie zadania:', currentTask.title);
         setSelectedTask(currentTask);
         startEditing(currentTask);
       } else if (input.toLowerCase() === 'd' && currentTask) {
@@ -101,14 +102,14 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
     setError(null);
     
     try {
-      console.log('📋 Ładowanie zadań...');
+      console.log('[INFO] Ładowanie zadań...');
       const taskList = await getTasks();
-      console.log('✅ Zadania załadowane:', taskList.length);
+      console.log('[OK] Zadania załadowane:', taskList.length);
       setTasks(taskList);
       setCurrentTaskIndex(0); // Reset to first task
       setViewState('list');
     } catch (err) {
-      console.error('❌ Błąd podczas ładowania zadań:', err);
+      console.error('[ERROR] Błąd podczas ładowania zadań:', err);
       setError(err instanceof Error ? err.message : 'Błąd podczas ładowania zadań');
       setViewState('list');
     } finally {
@@ -130,9 +131,9 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
       console.log('🔄 Zmiana statusu zadania:', task.id, 'na', newStatus);
       await updateTask(task.id!, updates);
       await loadTasks();
-      console.log('✅ Status zadania zmieniony');
+      console.log('[OK] Status zadania zmieniony');
     } catch (err) {
-      console.error('❌ Błąd podczas zmiany statusu:', err);
+      console.error('[ERROR] Błąd podczas zmiany statusu:', err);
       setError(err instanceof Error ? err.message : 'Błąd podczas zmiany statusu');
     } finally {
       setIsLoading(false);
@@ -165,14 +166,14 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
         priority: editPriority
       };
 
-      console.log('💾 Zapisywanie zmian zadania:', selectedTask.id, updates);
+      console.log('[SAVE] Zapisywanie zmian zadania:', selectedTask.id, updates);
       await updateTask(selectedTask.id!, updates);
       await loadTasks();
       setViewState('list');
       setSelectedTask(null);
-      console.log('✅ Zadanie zaktualizowane');
+      console.log('[OK] Zadanie zaktualizowane');
     } catch (err) {
-      console.error('❌ Błąd podczas zapisywania:', err);
+      console.error('[ERROR] Błąd podczas zapisywania:', err);
       setError(err instanceof Error ? err.message : 'Błąd podczas zapisywania');
     } finally {
       setIsLoading(false);
@@ -191,9 +192,9 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
       await loadTasks();
       setViewState('list');
       setSelectedTask(null);
-      console.log('✅ Zadanie usunięte');
+      console.log('[OK] Zadanie usunięte');
     } catch (err) {
-      console.error('❌ Błąd podczas usuwania:', err);
+      console.error('[ERROR] Błąd podczas usuwania:', err);
       setError(err instanceof Error ? err.message : 'Błąd podczas usuwania');
     } finally {
       setIsLoading(false);
@@ -201,8 +202,8 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
   };
 
   const formatTaskDisplay = (task: Task) => {
-    const status = task.status === 'done' ? '✅' : '⭕';
-    const priority = task.priority ? priorityIcons[task.priority] : '⚪';
+    const status = task.status === 'done' ? '[OK]' : '[O]';
+    const priority = task.priority ? priorityIcons[task.priority] : '[O]';
     const energy = task.energy_level || '?';
     const time = task.time_needed || '?';
     
@@ -213,7 +214,7 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
     if (isLoading && tasks.length === 0) {
       return (
         <Box>
-          <Text color="yellow">⏳ Ładowanie zadań...</Text>
+          <LoadingSpinner message="Ładowanie zadań..." type="dots" color="yellow" />
         </Box>
       );
     }
@@ -221,7 +222,7 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
     if (tasks.length === 0) {
       return (
         <Box flexDirection="column">
-          <Text color="gray">📝 Nie masz jeszcze żadnych zadań.</Text>
+          <Text color="gray">[TASK] Nie masz jeszcze żadnych zadań.</Text>
           <Text color="gray">Dodaj pierwsze zadanie z menu głównego!</Text>
           <Box marginTop={2}>
             <Text color="gray">Esc - powrót do menu</Text>
@@ -245,20 +246,17 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
           ))}
         </Box>
 
-        {tasks[currentTaskIndex] && (
+        {/* {tasks[currentTaskIndex] && (
           <Box marginTop={1} paddingY={1} borderTop borderStyle="single" borderColor="cyan">
             <Text color="cyan">
               Wybrane: {tasks[currentTaskIndex].title}
             </Text>
           </Box>
-        )}
+        )} */}
 
-        <Box marginTop={1} flexDirection="column">
+        <Box marginTop={1} flexDirection="column" borderStyle="round" borderColor="grey">
           <Text color="gray">
-            ↑↓ nawiguj po liście │ Enter = zmień status wybranego │ E = edytuj │ D = usuń │ Esc = menu
-          </Text>
-          <Text color="yellow" dimColor>
-            💡 Operacje działają na aktualnie podświetlonym zadaniu
+            ↑↓ nawiguj po liście │ Enter = done/todo │ E = edytuj │ D = usuń │ Esc = menu
           </Text>
         </Box>
       </Box>
@@ -391,8 +389,8 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
               <Box marginTop={2}>
                 <SelectInput
                   items={[
-                    { label: '✅ Zapisz zmiany', value: 'save' },
-                    { label: '↩️ Powrót do edycji', value: 'back' }
+                    { label: 'Zapisz zmiany', value: 'save' },
+                    { label: '↩ Powrót do edycji', value: 'back' }
                   ]}
                   onSelect={(item) => {
                     if (item.value === 'save') {
@@ -442,7 +440,7 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
         <Box marginTop={2}>
           <SelectInput
             items={[
-              { label: '❌ Tak, usuń to zadanie', value: 'confirm' },
+              { label: '[ERROR] Tak, usuń to zadanie', value: 'confirm' },
               { label: '↩️ Nie, powrót do listy', value: 'cancel' }
             ]}
             onSelect={(item) => {
@@ -510,12 +508,12 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
         >
           <Box flexDirection="column" width="100%">
             <Text color="cyan" bold>
-              📋 ZARZĄDZAJ ZADANIAMI
+                              [INFO] ZARZĄDZAJ ZADANIAMI
             </Text>
             
             {error && (
               <Box marginTop={1} marginBottom={1}>
-                <Text color="red">❌ {error}</Text>
+                <Text color="red">[ERROR] {error}</Text>
               </Box>
             )}
             

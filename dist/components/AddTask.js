@@ -4,6 +4,7 @@ import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import { Header } from './Header.js';
+import LoadingSpinner from './LoadingSpinner.js';
 import { createTask } from '../services/tasks.js';
 const energyOptions = [
     { label: 'XS - Bardzo mała energia', value: 'XS' },
@@ -65,7 +66,7 @@ export const AddTask = ({ onBack, onTaskAdded }) => {
             let errorMessage = 'Wystąpił błąd podczas zapisywania zadania';
             if (err instanceof Error) {
                 errorMessage = err.message;
-                console.error('📋 Szczegóły błędu:', {
+                console.error('[INFO] Szczegóły błędu:', {
                     name: err.name,
                     message: err.message,
                     stack: err.stack
@@ -75,7 +76,7 @@ export const AddTask = ({ onBack, onTaskAdded }) => {
             if (typeof err === 'object' && err !== null) {
                 const supabaseError = err;
                 if (supabaseError.code || supabaseError.details) {
-                    console.error('🔴 Błąd Supabase:', {
+                    console.error('[ERROR] Błąd Supabase:', {
                         code: supabaseError.code,
                         message: supabaseError.message,
                         details: supabaseError.details,
@@ -148,8 +149,8 @@ export const AddTask = ({ onBack, onTaskAdded }) => {
         }
     };
     if (isSubmitting) {
-        return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 45, justifyContent: "center", children: _jsx(Text, { color: "yellow", children: "\uD83D\uDCBE Zapisywanie zadania..." }) })] }));
+        return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 45, justifyContent: "center", children: _jsx(LoadingSpinner, { message: "Zapisywanie zadania...", type: "dots", color: "yellow" }) })] }));
     }
-    return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { flexDirection: "column", alignItems: "center", children: _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 45, children: _jsxs(Box, { flexDirection: "column", width: "100%", children: [_jsx(Text, { color: "cyan", bold: true, children: "\u2795 DODAJ NOWE ZADANIE" }), _jsxs(Box, { marginTop: 1, children: [error && (_jsx(Box, { marginBottom: 1, children: _jsxs(Text, { color: "red", children: ["\u274C ", error] }) })), renderStep()] })] }) }) })] }));
+    return (_jsxs(Box, { flexDirection: "column", children: [_jsx(Header, {}), _jsx(Box, { flexDirection: "column", alignItems: "center", children: _jsx(Box, { borderStyle: "round", borderColor: "cyan", paddingX: 2, paddingY: 1, minWidth: 45, children: _jsxs(Box, { flexDirection: "column", width: "100%", children: [_jsx(Text, { color: "cyan", bold: true, children: "\u2795 DODAJ NOWE ZADANIE" }), _jsxs(Box, { marginTop: 1, children: [error && (_jsx(Box, { marginBottom: 1, children: _jsxs(Text, { color: "red", children: ["[ERROR] ", error] }) })), renderStep()] })] }) }) })] }));
 };
 //# sourceMappingURL=AddTask.js.map

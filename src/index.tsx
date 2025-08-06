@@ -1,10 +1,16 @@
 #!/usr/bin/env node
 
+import dotenv from 'dotenv';
 import React, { useState } from 'react';
+
+// Load environment variables at the very start
+dotenv.config();
 import { render, useApp } from 'ink';
 import { MainMenu } from './components/MainMenu.js';
 import { AddTask } from './components/AddTask.js';
 import { ManageTasks } from './components/ManageTasks.js';
+import { ManageGoals } from './components/ManageGoals.js';
+import { FocusSession } from './components/FocusSession.js';
 import { Settings } from './components/Settings.js';
 import { colors } from './utils/theme.js';
 
@@ -35,7 +41,7 @@ const App: React.FC = () => {
         exit();
         break;
       default:
-        console.log(`${colors.warning('⚠️  Funkcja')} ${colors.bold(value)} ${colors.warning('jeszcze nie została zaimplementowana!')}`);
+        console.log(`${colors.warning('[WARN] Funkcja')} ${colors.bold(value)} ${colors.warning('jeszcze nie została zaimplementowana!')}`);
         setCurrentState('menu');
     }
   };
@@ -45,7 +51,7 @@ const App: React.FC = () => {
   };
 
   const handleTaskAdded = () => {
-    console.log(colors.success('✅ Zadanie zostało pomyślnie dodane!'));
+    console.log(colors.success('[OK] Zadanie zostało pomyślnie dodane!'));
     setCurrentState('menu');
   };
 
@@ -57,6 +63,10 @@ const App: React.FC = () => {
         return <AddTask onBack={handleBack} onTaskAdded={handleTaskAdded} />;
       case 'manage-tasks':
         return <ManageTasks onBack={handleBack} />;
+      case 'manage-goals':
+        return <ManageGoals onBack={handleBack} />;
+      case 'focus-mode':
+        return <FocusSession onBack={handleBack} />;
       case 'settings':
         return <Settings onBack={handleBack} />;
       default:

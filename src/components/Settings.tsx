@@ -3,6 +3,7 @@ import { Box, Text, useInput } from 'ink';
 import TextInput from 'ink-text-input';
 import SelectInput from 'ink-select-input';
 import { Header } from './Header.js';
+import LoadingSpinner from './LoadingSpinner.js';
 import { colors } from '../utils/theme.js';
 import { getUserId, setUserId, getConfigPath } from '../services/config.js';
 
@@ -99,7 +100,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
       case 'menu':
         return (
           <Box flexDirection="column">
-            <Text color="cyan" bold>⚙️  USTAWIENIA</Text>
+            <Text color="cyan" bold>[SETTINGS]  USTAWIENIA</Text>
             
             <Box marginTop={1}>
               <Text color="gray">
@@ -123,7 +124,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
       case 'change-user-id':
         return (
           <Box flexDirection="column">
-            <Text color="cyan" bold>👤 ZMIEŃ USER ID</Text>
+            <Text color="cyan" bold>[USER] ZMIEŃ USER ID</Text>
             
             <Box marginTop={1}>
               <Text color="gray">
@@ -147,14 +148,14 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
             {message && (
               <Box marginTop={1}>
                 <Text color={message.includes('pomyślnie') ? 'green' : 'red'}>
-                  {message.includes('pomyślnie') ? '✅' : '❌'} {message}
+                  {message.includes('pomyślnie') ? '[OK]' : '[ERROR]'} {message}
                 </Text>
               </Box>
             )}
             
             {isLoading && (
               <Box marginTop={1}>
-                <Text color="yellow">💾 Zapisywanie...</Text>
+                <LoadingSpinner message="Zapisywanie..." type="dots" color="yellow" />
               </Box>
             )}
             
@@ -169,7 +170,7 @@ export const Settings: React.FC<SettingsProps> = ({ onBack }) => {
       case 'info':
         return (
           <Box flexDirection="column">
-            <Text color="cyan" bold>ℹ️  INFORMACJE O KONFIGURACJI</Text>
+            <Text color="cyan" bold>[INFO]  INFORMACJE O KONFIGURACJI</Text>
             
             <Box marginTop={2} flexDirection="column">
               <Text>
