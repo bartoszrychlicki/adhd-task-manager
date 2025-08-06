@@ -1,6 +1,10 @@
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
 
 interface UserConfig {
   userId: string;
@@ -66,4 +70,24 @@ export const setUserId = async (userId: string): Promise<void> => {
 
 export const getConfigPath = (): string => {
   return CONFIG_FILE;
+};
+
+// Environment variable validation
+export const validateEnvironment = (): void => {
+  const requiredEnvVars = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
+  const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+  
+  if (missingVars.length > 0) {
+    throw new Error(`Missing required environment variables: ${missingVars.join(', ')}. Please check your .env file.`);
+  }
+};
+
+// Get Supabase configuration from environment variables
+export const getSupabaseConfig = () => {
+  validateEnvironment();
+  
+  return {
+    url: process.env.SUPABASE_URL!,
+    anonKey: process.env.SUPABASE_ANON_KEY!
+  };
 };

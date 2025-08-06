@@ -5,6 +5,9 @@ import React, { useState } from 'react';
 
 // Load environment variables at the very start
 dotenv.config();
+
+// Validate environment variables
+import { validateEnvironment } from './services/config.js';
 import { render, useApp } from 'ink';
 import { MainMenu } from './components/MainMenu.js';
 import { AddTask } from './components/AddTask.js';
@@ -79,7 +82,15 @@ const App: React.FC = () => {
 
 // Check if we can use raw mode
 if (process.stdin.isTTY) {
-  render(<App />);
+  try {
+    // Validate environment variables before starting the app
+    validateEnvironment();
+    render(<App />);
+  } catch (error) {
+    console.error('❌ Environment validation failed:', error.message);
+    console.error('📝 Please check your .env file and ensure all required variables are set.');
+    process.exit(1);
+  }
 } else {
   console.log('Aplikacja wymaga uruchomienia w terminalu z obsługą TTY');
   process.exit(1);

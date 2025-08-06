@@ -11,7 +11,8 @@
     "dev": "tsx src/index.tsx",
     "build": "tsc",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "setup": "node scripts/setup-env.js"
   },
   "keywords": [
     "adhd",
