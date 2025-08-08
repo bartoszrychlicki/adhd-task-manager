@@ -7,6 +7,7 @@ import LoadingSpinner from './LoadingSpinner.js';
 import { colors } from '../utils/theme.js';
 import { Goal, GoalType, GoalTimeframe } from '../types/index.js';
 import { getGoals, createGoal, updateGoal, deleteGoal } from '../services/goals.js';
+import { Panel, SectionTitle, KeyBar } from './ui.js';
 
 interface ManageGoalsProps {
   onBack: () => void;
@@ -236,24 +237,7 @@ export const ManageGoals: React.FC<ManageGoalsProps> = ({ onBack }) => {
           ))}
         </Box>
 
-        {/* {goals[currentGoalIndex] && (
-          <Box marginTop={1} paddingY={1} borderTop borderStyle="single" borderColor="cyan">
-            <Text color="cyan">
-              Wybrany: {goals[currentGoalIndex].title}
-            </Text>
-            {goals[currentGoalIndex].description && (
-              <Text color="gray">
-                Opis: {goals[currentGoalIndex].description}
-              </Text>
-            )}
-          </Box>
-        )} */}
-
-        <Box marginTop={1} flexDirection="column">
-          <Text color="gray">
-            ↑↓ nawiguj │ N = nowy cel │ E = edytuj │ D = usuń │ Esc = menu
-          </Text>
-        </Box>
+        <KeyBar items={[{ key: '↑↓', label: 'nawiguj' }, { key: 'N', label: 'nowy' }, { key: 'E', label: 'edytuj' }, { key: 'D', label: 'usuń' }, { key: 'Esc', label: 'menu' }]} />
       </Box>
     );
   };
@@ -480,29 +464,17 @@ export const ManageGoals: React.FC<ManageGoalsProps> = ({ onBack }) => {
       <Header />
       
       <Box flexDirection="column" alignItems="center">
-        <Box 
-          borderStyle="round" 
-          borderColor="cyan"
-          paddingX={2}
-          paddingY={1}
-          minWidth={70}
-        >
-          <Box flexDirection="column" width="100%">
-            <Text color="cyan" bold>
-                              [TARGET] ZARZĄDZAJ CELAMI
-            </Text>
-            
-            {error && (
-              <Box marginTop={1} marginBottom={1}>
-                <Text color="red">[ERROR] {error}</Text>
-              </Box>
-            )}
-            
-            <Box marginTop={1}>
-              {renderCurrentView()}
+        <Panel borderColor="cyan" minWidth={70}>
+          <SectionTitle label="[TARGET] ZARZĄDZAJ CELAMI" />
+          {error && (
+            <Box marginTop={1} marginBottom={1}>
+              <Text color="red">[ERROR] {error}</Text>
             </Box>
+          )}
+          <Box marginTop={1}>
+            {renderCurrentView()}
           </Box>
-        </Box>
+        </Panel>
       </Box>
     </Box>
   );

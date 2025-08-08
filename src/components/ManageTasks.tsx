@@ -7,6 +7,7 @@ import LoadingSpinner from './LoadingSpinner.js';
 import { colors, energyColors, priorityColors, priorityIcons } from '../utils/theme.js';
 import { Task, EnergyLevel, TimeNeeded, Priority } from '../types/index.js';
 import { getTasks, updateTask, deleteTask } from '../services/tasks.js';
+import { Panel, SectionTitle, KeyBar } from './ui.js';
 
 interface ManageTasksProps {
   onBack: () => void;
@@ -246,19 +247,7 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
           ))}
         </Box>
 
-        {/* {tasks[currentTaskIndex] && (
-          <Box marginTop={1} paddingY={1} borderTop borderStyle="single" borderColor="cyan">
-            <Text color="cyan">
-              Wybrane: {tasks[currentTaskIndex].title}
-            </Text>
-          </Box>
-        )} */}
-
-        <Box marginTop={1} flexDirection="column" borderStyle="round" borderColor="grey">
-          <Text color="gray">
-            ↑↓ nawiguj po liście │ Enter = done/todo │ E = edytuj │ D = usuń │ Esc = menu
-          </Text>
-        </Box>
+        <KeyBar items={[{ key: '↑↓', label: 'nawiguj' }, { key: 'Enter', label: 'done/todo' }, { key: 'E', label: 'edytuj' }, { key: 'D', label: 'usuń' }, { key: 'Esc', label: 'menu' }]} />
       </Box>
     );
   };
@@ -499,29 +488,17 @@ export const ManageTasks: React.FC<ManageTasksProps> = ({ onBack }) => {
       <Header />
       
       <Box flexDirection="column" alignItems="center">
-        <Box 
-          borderStyle="round" 
-          borderColor="cyan"
-          paddingX={2}
-          paddingY={1}
-          minWidth={70}
-        >
-          <Box flexDirection="column" width="100%">
-            <Text color="cyan" bold>
-                              [INFO] ZARZĄDZAJ ZADANIAMI
-            </Text>
-            
-            {error && (
-              <Box marginTop={1} marginBottom={1}>
-                <Text color="red">[ERROR] {error}</Text>
-              </Box>
-            )}
-            
-            <Box marginTop={1}>
-              {renderCurrentView()}
+        <Panel borderColor="cyan" minWidth={70}>
+          <SectionTitle label="[INFO] ZARZĄDZAJ ZADANIAMI" />
+          {error && (
+            <Box marginTop={1} marginBottom={1}>
+              <Text color="red">[ERROR] {error}</Text>
             </Box>
+          )}
+          <Box marginTop={1}>
+            {renderCurrentView()}
           </Box>
-        </Box>
+        </Panel>
       </Box>
     </Box>
   );

@@ -1,10 +1,8 @@
 import React from 'react';
 import { Text, Box } from 'ink';
 import figlet from 'figlet';
-import { colors } from '../utils/theme.js';
 
 export const Header: React.FC = () => {
-  // Generate ASCII art with figlet - using retro fonts
   const adhdText = figlet.textSync('ADHD', {
     font: 'Block' as figlet.Fonts,
     horizontalLayout: 'fitted',
@@ -18,32 +16,16 @@ export const Header: React.FC = () => {
   });
 
   return (
-    <Box flexDirection="column" alignItems="center" marginBottom={2}>
-      {/* Main ADHD ASCII Art - Generated with figlet */}
-      <Text color="cyan" bold>
-        {adhdText}
-      </Text>
-      
-      {/* Subtitle - Generated with figlet */}
+    <Box flexDirection="column" alignItems="center" marginBottom={1}>
+      <Text color="cyan" bold>{adhdText}</Text>
       <Box marginTop={0}>
-        <Text color="yellow">
-          {taskManagerText}
-        </Text>
+        <Text color="yellow">{taskManagerText}</Text>
       </Box>
-      
-      {/* C64-style top border */}
-      <Box marginTop={1}>
-        <Text color="magenta" bold>
-          ═══════════════════════════════════════════════════════════════════
-        </Text>
+      <Box marginTop={0}>
+        <Text color="gray">──────────────────────────────────────────────────────────────</Text>
       </Box>
-      
-      
-      {/* Status line */}
-      <Box marginTop={1}>
-        <Text color="cyan" dimColor>
-          [SYSTEM READY] • [64KB RAM FREE] • [PRESS ANY KEY TO CONTINUE]
-        </Text>
+      <Box marginTop={0}>
+        <Text color="gray" dimColor>[READY] Modern CLI • Ink + React • Esc = Back</Text>
       </Box>
     </Box>
   );

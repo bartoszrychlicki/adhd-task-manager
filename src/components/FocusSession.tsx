@@ -7,6 +7,7 @@ import LoadingSpinner from './LoadingSpinner.js';
 import { EnergyLevel } from '../types/index.js';
 import { startFocusSession, executeQuickAction } from '../services/focus.js';
 import { updateTask } from '../services/tasks.js';
+import { Panel, SectionTitle, KeyBar } from './ui.js';
 
 // Simplified focus mode - no chat commands, just keyboard shortcuts
 
@@ -117,9 +118,9 @@ export const FocusSession: React.FC<FocusSessionProps> = ({ onBack }) => {
       // Update task status FIRST if completed
       if ((action === 'completed' || action === 'completed_end_session') && currentTask.id) {
         try {
-          console.log('[UPDATE] Updating task status to completed:', currentTask.id);
-          const updatedTask = await updateTask(currentTask.id, { status: 'completed' });
-          console.log('[OK] Task marked as completed in database:', updatedTask);
+          console.log('[UPDATE] Updating task status to done:', currentTask.id);
+          const updatedTask = await updateTask(currentTask.id, { status: 'done', completed_at: new Date().toISOString() } as any);
+          console.log('[OK] Task marked as done in database:', updatedTask);
           // Short delay to ensure database consistency
           await new Promise(resolve => setTimeout(resolve, 100));
         } catch (dbError) {
@@ -303,33 +304,29 @@ export const FocusSession: React.FC<FocusSessionProps> = ({ onBack }) => {
       <Box flexDirection="column">
         {/* Loading spinner when AI is working */}
         {isLoading && (
-          <Box justifyContent="center" marginBottom={2}>
+          <Box justifyContent="center" marginBottom={1}>
             <LoadingSpinner message="AI wybiera zadanie..." type="dots" color="gray" />
           </Box>
         )}
 
         {/* Current Task Display */}
         {currentTask && !isLoading && (
-          <Box flexDirection="column" marginBottom={2} borderStyle="round" borderColor="cyan" paddingX={3} paddingY={2}>
-            <Box justifyContent="center" marginBottom={2}>
+          <Panel borderColor="cyan">
+            <Box justifyContent="center" marginBottom={1}>
               <Text color="cyan" bold>[AKTUALNE ZADANIE]</Text>
             </Box>
-            <Box justifyContent="center" marginBottom={2}>
+            <Box justifyContent="center" marginBottom={1}>
               <Text color="white" bold>{currentTask.title}</Text>
             </Box>
             <Box justifyContent="center">
               <Text color="yellow">[TIME] {minutes}:{seconds.toString().padStart(2, '0')}</Text>
             </Box>
-          </Box>
+          </Panel>
         )}
 
         {/* Simple 3-option menu */}
         {currentTask && !isLoading && (
-          <Box marginTop={1} flexDirection="column" borderStyle="round" borderColor="grey">
-            <Text color="gray">
-              1 = Pomiń zadanie │ 2 = Zrobione │ 3 = Koniec sesji
-            </Text>
-          </Box>
+          <KeyBar items={[{ key: '1', label: 'Pomiń' }, { key: '2', label: 'Zrobione' }, { key: '3', label: 'Koniec sesji' }]} />
         )}
       </Box>
     );
@@ -350,24 +347,15 @@ export const FocusSession: React.FC<FocusSessionProps> = ({ onBack }) => {
   };
 
   return (
-    <Box flexDirection="column" height="100%">
+    <Box flexDirection="column">
       <Header />
       
-      <Box flexDirection="column" alignItems="center" flexGrow={1}>
-        <Box 
-          borderStyle="round" 
-          borderColor="grey"
-          paddingX={1}
-          paddingY={2}
-          minWidth={80}
-          width="100%"
-        >
-          <Box flexDirection="column" width="100%">
-            {sessionState === 'setup' && renderSetup()}
-            {sessionState === 'active' && renderActiveSession()}
-            {sessionState === 'completed' && renderCompleted()}
-          </Box>
-        </Box>
+      <Box flexDirection="column" alignItems="center">
+        <Panel borderColor="grey" minWidth={80} width="100%">
+          {sessionState === 'setup' && renderSetup()}
+          {sessionState === 'active' && renderActiveSession()}
+          {sessionState === 'completed' && renderCompleted()}
+        </Panel>
       </Box>
     </Box>
   );

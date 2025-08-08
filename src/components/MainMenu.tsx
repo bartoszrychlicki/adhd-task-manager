@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Text } from 'ink';
 import SelectInput from 'ink-select-input';
 import { Header } from './Header.js';
-import { colors } from '../utils/theme.js';
 import { MenuOption } from '../types/index.js';
+import { Panel, KeyBar } from './ui.js';
 
 interface MainMenuProps {
   onSelect: (value: string) => void;
@@ -22,28 +22,14 @@ export const MainMenu: React.FC<MainMenuProps> = ({ onSelect }) => {
   return (
     <Box flexDirection="column">
       <Header />
-      
       <Box flexDirection="column" alignItems="center">
-        <Box 
-          borderStyle="round" 
-          borderColor="green"
-          paddingX={1}
-          paddingY={1}
-          minWidth={55}
-        >
-          <Box flexDirection="column" width="100%">
-            <SelectInput
-              items={menuItems}
-              onSelect={(item) => onSelect(item.value)}
-            />
-            
-            <Box marginTop={1}>
-              <Text color="gray">
-                Użyj ↑↓ lub cyfr do nawigacji, Enter aby wybrać
-              </Text>
-            </Box>
-          </Box>
-        </Box>
+        <Panel borderColor="cyan" minWidth={55}>
+          <SelectInput
+            items={menuItems}
+            onSelect={(item) => onSelect(item.value)}
+          />
+          <KeyBar items={[{ key: '↑↓', label: 'nawiguj' }, { key: 'Enter', label: 'wybierz' }, { key: '1-6', label: 'skróty' }]} />
+        </Panel>
       </Box>
     </Box>
   );
